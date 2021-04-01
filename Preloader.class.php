@@ -41,21 +41,11 @@ class Preloader {
 		if ( $title && $title->exists() ) {
 			$revision = Revision::newFromTitle( $title );
 			$content = $revision->getContent();
-			$text = ContentHandler::getContentText( $content );
-			return self::transform( $text );
+			$parserOptions = ParserOptions::newFromUser( $wgUser );
+			$transformed = $content->preloadTransform( $title, $parserOptions );
+			return ContentHandler::getContentText( $transformed );
 		} else {
 			return false;
 		}
-	}
-
-	/**
-	 * Remove sections from the text and trim whitespace
-	 *
-	 * @param $text
-	 * @return string
-	 */
-	static function transform( $text ) {
-		$text = trim( preg_replace( '/<\/?includeonly>/s', '', $text ) );
-		return trim( preg_replace( '/<noinclude>.*<\/noinclude>/s', '', $text ) );
 	}
 }
